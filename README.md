@@ -1,4 +1,4 @@
-ELIZA
+# ELIZA
 
 A Typescript implementation of the ELIZA chatbot.
 
@@ -26,7 +26,8 @@ A decomposition rule is used to break down a user's input and see if it matches 
 If the input matches the criteria, an associated reassembly rule is used to create the response.
 Only decomposition rules containing keywords present in the user input need to be tried.
 
-Examples:
+### Examples:
+
 1.
 User input: It seems you hate me
 Keywords: YOU, ME
@@ -45,15 +46,16 @@ Response: The program would return a generic response or a previous tranformatio
 Explanation: Since there is more than a single word between YOU and ME in the user input,
              the decomposition rule did not have its criteria met
 
-List Representation:
+### List Representation:
 K = Keyword, Di = i'th Decomposition rule, Rij = j'th Reassembly rule associated with the i'th D
+
 (K  (D1, R11, ... R1m)
     (D2, R11, ... R2m)
     .             .
     .             .
     (Dn, Rn1, ... Rnm))
 
-Practical Representation:
+### Practical Representation:
 A HashMap stores {K: (Di, Ri1, ..., Rij)} key-value pairs. The keyword is used as the key and the
 list is used as the value.
 
