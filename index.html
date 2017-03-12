@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="bundle.js"></script>
+    <title>Eliza</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 50px;
+        }
+        #input {
+            margin-top: 20px;
+            width: 85%;
+        }
+        #response, #user {
+            width: 30vw;
+        }
+    </style>
+</head>
+<body>
+    <textarea rows="20" id="response" readonly></textarea>
+    <div id="user">
+        <input type="text" id="input" />
+        <button id="submit">Submit</button>
+    </div>
+</body>
+</html>
