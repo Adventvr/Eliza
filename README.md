@@ -1,6 +1,7 @@
 # ELIZA
 
-A Typescript implementation of the ELIZA chatbot. Keyword rules (keywords.ts) are from https://github.com/brandongmwong/elizabot-js.
+A Typescript implementation of the ELIZA chatbot. Keyword rules (keywords.ts) are a modified
+version of the elizaKeywords from https://github.com/brandongmwong/elizabot-js.
 
 ## Background
 

@@ -6,8 +6,18 @@ window.onload = function () {
     let respEl = document.getElementById('response');
     let submit = document.getElementById('submit');
     submit.addEventListener('click', function () {
-        let input = inputEl.value;
-        let resp = e.getResponse(input);
-        respEl.value = respEl.value + '\nyou: ' + input + '\neliza: ' + resp + '\n';
+        getResponse(inputEl, respEl);
+    });
+    inputEl.addEventListener("keyup", function (event) {
+        event.preventDefault();
+        if (event.keyCode == 13) {
+            getResponse(inputEl, respEl);
+        }
     });
 };
+function getResponse(inputEl, respEl) {
+    let input = inputEl.value;
+    let resp = e.getResponse(input);
+    respEl.value = respEl.value + '\nyou: ' + input + '\neliza: ' + resp + '\n';
+    inputEl.value = '';
+}

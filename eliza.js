@@ -48,7 +48,7 @@ export class Eliza {
         return null;
     }
     getRegExp(input) {
-        let transform = input.replace('*', '.+');
+        let transform = input.replace(/\*/g, '.*');
         return new RegExp(transform);
     }
     randomNumIncl(min, max) {

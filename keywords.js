@@ -14,26 +14,6 @@ export let elizaKeywords = [
         ]]
       ]]
     */
-    ["xnone", 0, [
-            ["*", [
-                    "I'm not sure I understand you fully.",
-                    "Please go on.",
-                    "Can you repeat that please ?",
-                    "What does that suggest to you ?",
-                    "Do you feel strongly about discussing such things ?",
-                    "That is interesting.  Please continue.",
-                    "Tell me more about that.",
-                    "Do go on.",
-                    "Please talk more about it",
-                    "Does talking about this bother you ?",
-                    "Can you rephrase that ?",
-                    "I see. Tell me more.",
-                    "Interesting. Is this something you are sorry about ?",
-                    "Mmm hmmm. Is this is your favorite subject ?",
-                    "Now we are getting somewhere. Explain more.",
-                    "I see. How does that make you feel ?"
-                ]]
-        ]],
     ["sorry", 0, [
             ["*", [
                     "Please don't apologize.",
@@ -46,7 +26,12 @@ export let elizaKeywords = [
         ]],
     ["apologize", 0, [
             ["*", [
-                    "goto sorry"
+                    "Please don't apologize.",
+                    "Apologies are not necessary.",
+                    "I've told you that apologies are not required.",
+                    "It did not bother me.  Please continue.",
+                    "I have no feelings. Do continue.",
+                    "There is nothing to worry about"
                 ]]
         ]],
     ["remember", 5, [
