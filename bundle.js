@@ -82,23 +82,34 @@ class Eliza {
     }
     buildScript(data) {
         for (let x = 0; x < data.length; x++) {
-            let k = new KeywordData(data[x][0], data[x][1], data[x][2]);
+            let rules = this.buildRules(data[x][2]);
+            let k = new KeywordData(data[x][0], data[x][1], rules);
             this.script.set(k.keyword, k);
         }
+    }
+    buildRules(rules) {
+        let result = [];
+        for (let rule of rules) {
+            let r = new Rule(rule);
+            result.push(r);
+        }
+        return result;
     }
     getResponse(input) {
         input = this.sanatize(input);
         let decompositionRules = this.getDecompositionRules(input);
         if (decompositionRules == null)
             return __WEBPACK_IMPORTED_MODULE_0__keywords__["b" /* genericResponses */][this.randomNumIncl(0, __WEBPACK_IMPORTED_MODULE_0__keywords__["b" /* genericResponses */].length - 1)];
-        let reassemblyRule = this.getReassemblyRule(input, decompositionRules);
+        let decompositionRule = this.getDecompositionRule(input, decompositionRules);
+        let reassemblyRule = this.getReassemblyRule(input, decompositionRule);
         if (reassemblyRule == null)
             return __WEBPACK_IMPORTED_MODULE_0__keywords__["b" /* genericResponses */][this.randomNumIncl(0, __WEBPACK_IMPORTED_MODULE_0__keywords__["b" /* genericResponses */].length - 1)];
-        return this.reassemble(input, reassemblyRule);
+        return this.reassemble(input, reassemblyRule, decompositionRule.decompRule);
     }
     sanatize(input) {
-        return input.replace(/[\.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+        return input.replace(/[\.,\/#!$%\^&\*;:{}=\-_`~()]/g, ' ');
     }
+    /* find highest priority keywords and get associated decomp rules */
     getDecompositionRules(input) {
         let result;
         let maxPriority = -1;
@@ -111,15 +122,17 @@ class Eliza {
         }
         return result;
     }
-    getReassemblyRule(input, decompositionRules) {
-        let reassembRules;
-        for (let arr of decompositionRules) {
-            let regex = this.getRegExp(arr[0]);
+    /* return 1st decomp rule that matches input */
+    getDecompositionRule(input, rules) {
+        for (let rule of rules) {
+            let regex = this.getRegExp(rule.decompRule);
             if (regex.test(input)) {
-                return arr[1][this.randomNumIncl(1, arr[1].length - 1)];
+                return rule;
             }
         }
-        return null;
+    }
+    getReassemblyRule(input, rule) {
+        return rule.reassembRules[this.randomNumIncl(1, rule.reassembRules.length - 1)];
     }
     getRegExp(input) {
         let transform = input.replace(/\*/g, '.*');
@@ -128,12 +141,18 @@ class Eliza {
     randomNumIncl(min, max) {
         return (Math.floor(Math.random() * (max - min + 1)) + min);
     }
-    reassemble(input, reassemblyRule) {
-        let regex = /\((0-9)\)/;
-        let words = input.split(/\s+/);
-        // replace all (n) in input with words[n], where n is a # between 0 and 9
-        let result = reassemblyRule.replace(regex, (match, p) => words[p[1]]);
-        return result;
+    reassemble(input, reassembRule, decompRule) {
+        // find number (n) in reassemb rule
+        let match = /\([0-9]\)/g.exec(reassembRule);
+        if (match == null)
+            return reassembRule;
+        let wordNum = Number(match[0][1]);
+        // split decompRule and find nth grouping
+        let decompArr = decompRule.split('*').map(x => x.trim());
+        decompArr = decompArr.filter(x => x != '');
+        let inputArr = input.split(decompArr[0]).map(x => x.trim());
+        let replacement = inputArr[wordNum - 1];
+        return reassembRule.replace(/\([0-9]\)/g, replacement);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Eliza;
@@ -143,6 +162,12 @@ class KeywordData {
         this.keyword = _keyword;
         this.priority = _priority;
         this.rules = _rules;
+    }
+}
+class Rule {
+    constructor(rule) {
+        this.decompRule = rule[0];
+        this.reassembRules = rule[1];
     }
 }
 /*
@@ -252,8 +277,7 @@ let elizaKeywords = [
             ["* i dreamed *", [
                     "Really, (2) ?",
                     "Have you ever fantasized (2) while you were awake ?",
-                    "Have you ever dreamed (2) before ?",
-                    "goto dream"
+                    "Have you ever dreamed (2) before ?"
                 ]]
         ]],
     ["dream", 3, [
@@ -283,33 +307,29 @@ let elizaKeywords = [
         ]],
     ["deutsch", 0, [
             ["*", [
-                    "goto xforeign",
                     "Sorry I do not sprechen sie deutsch",
                     "I told you before, I don't understand German."
                 ]]
         ]],
     ["francais", 0, [
             ["*", [
-                    "goto xforeign",
                     "Why? Do you love to go to France?",
                     "I told you before, I don't understand French."
                 ]]
         ]],
     ["italiano", 0, [
             ["*", [
-                    "goto xforeign",
                     "Have you been to Rome?",
                     "I told you before, I don't understand Italian."
                 ]]
         ]],
     ["espanol", 0, [
             ["*", [
-                    "goto xforeign",
                     "Sorry I do not speak Spanish",
                     "I told you before, I don't understand Spanish."
                 ]]
         ]],
-    ["xforeign", 0, [
+    ["foreign", 0, [
             ["*", [
                     "I speak only English."
                 ]]
@@ -358,7 +378,10 @@ let elizaKeywords = [
                     "What if I were (2) ?"
                 ]],
             ["* you are *", [
-                    "goto you"
+                    "We were discussing you -- not me.",
+                    "Oh, I (2) ?",
+                    "You're not really talking about me -- are you ?",
+                    "What are your feelings now ?"
                 ]],
             ["* are *", [
                     "Did you think they might not be (2) ?",
@@ -402,7 +425,7 @@ let elizaKeywords = [
                 ]]
         ]],
     ["i", 0, [
-            ["* i @desire *", [
+            ["* i * desire *", [
                     "What would it mean to you if you got (3) ?",
                     "Why do you want (3) ?",
                     "Suppose you got (3) soon.",
@@ -410,28 +433,33 @@ let elizaKeywords = [
                     "What would getting (3) mean to you ?",
                     "What does wanting (3) have to do with this discussion ?"
                 ]],
-            ["* i am* @sad *", [
+            ["* i am * sad *", [
                     "I am sorry to hear that you are (3).",
                     "Do you think coming here will help you not to be (3) ?",
                     "I'm sure it's not pleasant to be (3).",
                     "Can you explain what made you (3) ?"
                 ]],
-            ["* i am* @happy *", [
+            ["* i am * happy *", [
                     "How have I helped you to be (3) ?",
                     "Has your treatment made you (3) ?",
                     "What makes you (3) just now ?",
                     "Can you explain why you are suddenly (3) ?"
                 ]],
             ["* i was *", [
-                    "goto was"
+                    "Were you really ?",
+                    "Why do you tell me you were (2) now ?",
+                    "Perhaps I already know you were (2)."
                 ]],
-            ["* i @belief i *", [
+            ["* i * believe i *", [
                     "Do you really think so ?",
                     "But you are not sure you (3).",
                     "Do you really doubt you (3) ?"
                 ]],
-            ["* i* @belief *you *", [
-                    "goto you"
+            ["* i * believe * you *", [
+                    "We were discussing you -- not me.",
+                    "Oh, I (4) ?",
+                    "You're not really talking about me -- are you ?",
+                    "What are your feelings now ?"
                 ]],
             ["* i am *", [
                     "Is it because you are (2) that you came to me ?",
@@ -443,7 +471,21 @@ let elizaKeywords = [
                     "Are your friends (2) too ?",
                     "Is your spouse (2) too ?"
                 ]],
-            ["* i @cannot *", [
+            ["* i cannot *", [
+                    "How do you know that you can't (3) ?",
+                    "Have you tried ?",
+                    "Perhaps you could (3) now.",
+                    "Do you really want to be able to (3) ?",
+                    "What if you could (3) ?"
+                ]],
+            ["* i cant *", [
+                    "How do you know that you can't (3) ?",
+                    "Have you tried ?",
+                    "Perhaps you could (3) now.",
+                    "Do you really want to be able to (3) ?",
+                    "What if you could (3) ?"
+                ]],
+            ["* i can't *", [
                     "How do you know that you can't (3) ?",
                     "Have you tried ?",
                     "Perhaps you could (3) now.",
@@ -528,15 +570,15 @@ let elizaKeywords = [
                 ]]
         ]],
     ["my", 2, [
-            ["$ * my *", [
+            ["* my *", [
                     "Does that have anything to do with the fact that your (2) ?",
                     "Lets discuss further why your (2).",
                     "Earlier you said your (2).",
                     "But your (2)."
                 ]],
-            ["* my* @family *", [
+            ["* my * family *", [
                     "Tell me more about your family.",
-                    "Who else in your family (4) ?",
+                    "Who else in your family (3) ?",
                     "Your (3) ?",
                     "What else comes to your mind when you think of your (3) ?"
                 ]],
@@ -624,7 +666,7 @@ let elizaKeywords = [
                 ]]
         ]],
     ["everyone", 2, [
-            ["* @everyone *", [
+            ["* everyone *", [
                     "Really, (2) ?",
                     "Surely not (2).",
                     "Can you think of anyone in particular ?",
@@ -638,17 +680,41 @@ let elizaKeywords = [
         ]],
     ["everybody", 2, [
             ["*", [
-                    "goto everyone"
+                    "Really, (2) ?",
+                    "Surely not (2).",
+                    "Can you think of anyone in particular ?",
+                    "Who, for example?",
+                    "Are you thinking of a very special person ?",
+                    "Who, may I ask ?",
+                    "Someone special perhaps ?",
+                    "You have a particular person in mind, don't you ?",
+                    "Who do you think you're talking about ?"
                 ]]
         ]],
     ["nobody", 2, [
             ["*", [
-                    "goto everyone"
+                    "Really, (2) ?",
+                    "Surely not (2).",
+                    "Can you think of anyone in particular ?",
+                    "Who, for example?",
+                    "Are you thinking of a very special person ?",
+                    "Who, may I ask ?",
+                    "Someone special perhaps ?",
+                    "You have a particular person in mind, don't you ?",
+                    "Who do you think you're talking about ?"
                 ]]
         ]],
     ["noone", 2, [
             ["*", [
-                    "goto everyone"
+                    "Really, (2) ?",
+                    "Surely not (2).",
+                    "Can you think of anyone in particular ?",
+                    "Who, for example?",
+                    "Are you thinking of a very special person ?",
+                    "Who, may I ask ?",
+                    "Someone special perhaps ?",
+                    "You have a particular person in mind, don't you ?",
+                    "Who do you think you're talking about ?"
                 ]]
         ]],
     ["always", 1, [
@@ -672,8 +738,15 @@ let elizaKeywords = [
                 ]]
         ]],
     ["like", 10, [
-            ["* @be *like *", [
-                    "goto alike"
+            ["* be * like *", [
+                    "In what way ?",
+                    "What resemblence do you see ?",
+                    "What does that similarity suggest to you ?",
+                    "What other connections do you see ?",
+                    "What do you suppose that resemblence means ?",
+                    "What is the connection, do you suppose ?",
+                    "Could there really be some connection ?",
+                    "How ?"
                 ]]
         ]],
     ["different", 0, [

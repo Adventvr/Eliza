@@ -8,23 +8,34 @@ export class Eliza {
     }
     buildScript(data) {
         for (let x = 0; x < data.length; x++) {
-            let k = new KeywordData(data[x][0], data[x][1], data[x][2]);
+            let rules = this.buildRules(data[x][2]);
+            let k = new KeywordData(data[x][0], data[x][1], rules);
             this.script.set(k.keyword, k);
         }
+    }
+    buildRules(rules) {
+        let result = [];
+        for (let rule of rules) {
+            let r = new Rule(rule);
+            result.push(r);
+        }
+        return result;
     }
     getResponse(input) {
         input = this.sanatize(input);
         let decompositionRules = this.getDecompositionRules(input);
         if (decompositionRules == null)
             return genericResponses[this.randomNumIncl(0, genericResponses.length - 1)];
-        let reassemblyRule = this.getReassemblyRule(input, decompositionRules);
+        let decompositionRule = this.getDecompositionRule(input, decompositionRules);
+        let reassemblyRule = this.getReassemblyRule(input, decompositionRule);
         if (reassemblyRule == null)
             return genericResponses[this.randomNumIncl(0, genericResponses.length - 1)];
-        return this.reassemble(input, reassemblyRule);
+        return this.reassemble(input, reassemblyRule, decompositionRule.decompRule);
     }
     sanatize(input) {
-        return input.replace(/[\.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+        return input.replace(/[\.,\/#!$%\^&\*;:{}=\-_`~()]/g, ' ');
     }
+    /* find highest priority keywords and get associated decomp rules */
     getDecompositionRules(input) {
         let result;
         let maxPriority = -1;
@@ -37,15 +48,17 @@ export class Eliza {
         }
         return result;
     }
-    getReassemblyRule(input, decompositionRules) {
-        let reassembRules;
-        for (let arr of decompositionRules) {
-            let regex = this.getRegExp(arr[0]);
+    /* return 1st decomp rule that matches input */
+    getDecompositionRule(input, rules) {
+        for (let rule of rules) {
+            let regex = this.getRegExp(rule.decompRule);
             if (regex.test(input)) {
-                return arr[1][this.randomNumIncl(1, arr[1].length - 1)];
+                return rule;
             }
         }
-        return null;
+    }
+    getReassemblyRule(input, rule) {
+        return rule.reassembRules[this.randomNumIncl(1, rule.reassembRules.length - 1)];
     }
     getRegExp(input) {
         let transform = input.replace(/\*/g, '.*');
@@ -54,12 +67,18 @@ export class Eliza {
     randomNumIncl(min, max) {
         return (Math.floor(Math.random() * (max - min + 1)) + min);
     }
-    reassemble(input, reassemblyRule) {
-        let regex = /\((0-9)\)/;
-        let words = input.split(/\s+/);
-        // replace all (n) in input with words[n], where n is a # between 0 and 9
-        let result = reassemblyRule.replace(regex, (match, p) => words[p[1]]);
-        return result;
+    reassemble(input, reassembRule, decompRule) {
+        // find number (n) in reassemb rule
+        let match = /\([0-9]\)/g.exec(reassembRule);
+        if (match == null)
+            return reassembRule;
+        let wordNum = Number(match[0][1]);
+        // split decompRule and find nth grouping
+        let decompArr = decompRule.split('*').map(x => x.trim());
+        decompArr = decompArr.filter(x => x != '');
+        let inputArr = input.split(decompArr[0]).map(x => x.trim());
+        let replacement = inputArr[wordNum - 1];
+        return reassembRule.replace(/\([0-9]\)/g, replacement);
     }
 }
 class KeywordData {
@@ -67,6 +86,12 @@ class KeywordData {
         this.keyword = _keyword;
         this.priority = _priority;
         this.rules = _rules;
+    }
+}
+class Rule {
+    constructor(rule) {
+        this.decompRule = rule[0];
+        this.reassembRules = rule[1];
     }
 }
 /*

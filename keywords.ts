@@ -51,13 +51,11 @@ export let elizaKeywords: [string, number, [string, string[]][]][] = [
 		     "Did you think I would forget (2) ?",
 		     "Why do you think I should recall (2) now ?",
 		     "What about (2) ?",
-		     "goto what",
 		     "You mentioned (2) ?"
 		  ]],
 		 ["* you remember *", [
 		     "How could I forget (2) ?",
 		     "What about (2) should I remember ?",
-		     "goto you"
 		  ]]
 		]],
 		["forget", 5, [
@@ -75,7 +73,6 @@ export let elizaKeywords: [string, number, [string, string[]][]][] = [
 		     "Are you sure you told me ?",
 		     "Would it bother you if I forgot (2) ?",
 		     "Why should I recall (2) just now ?",
-		     "goto what",
 		     "Tell me more about (2)."
 		  ]]
 		]],
@@ -95,7 +92,10 @@ export let elizaKeywords: [string, number, [string, string[]][]][] = [
 		     "Really, (2) ?",
 		     "Have you ever fantasized (2) while you were awake ?",
 		     "Have you ever dreamed (2) before ?",
-		     "goto dream"
+		     "What does that dream suggest to you ?",
+		     "Do you dream often ?",
+		     "What persons appear in your dreams ?",
+		     "Do you believe that dreams have something to do with your problem ?"
 		  ]]
 		]],
 		["dream", 3, [
@@ -174,11 +174,10 @@ export let elizaKeywords: [string, number, [string, string[]][]][] = [
 		     "Do you believe you are (2) ?",
 		     "Would you want to be (2) ?",
 		     "Do you wish I would tell you you are (2) ?",
-		     "What would it mean if you were (2) ?",
-		     "goto what"
+		     "What would it mean if you were (2) ?"
 		  ]],
 		 ["* i am *", [
-		     "goto i"
+		     "Are you?"
 		  ]],
 		 ["*", [
 		     "Why do you say 'am' ?",
@@ -191,7 +190,6 @@ export let elizaKeywords: [string, number, [string, string[]][]][] = [
 		     "Would you prefer if I weren't (2) ?",
 		     "Perhaps I am (2) in your fantasies.",
 		     "Do you sometimes think I am (2) ?",
-		     "goto what",
 		     "Would it matter to you ?",
 		     "What if I were (2) ?"
 		  ]],
@@ -226,8 +224,7 @@ export let elizaKeywords: [string, number, [string, string[]][]][] = [
 		     "Do you think you were (2) ?",
 		     "Were you (2) ?",
 		     "What would it mean if you were (2) ?",
-		     "What does ' (2) ' suggest to you ?",
-		     "goto what"
+		     "What does ' (2) ' suggest to you ?"
 		  ]],
 		 ["* i was *", [
 		     "Were you really ?",
@@ -338,7 +335,14 @@ export let elizaKeywords: [string, number, [string, string[]][]][] = [
 		]],
 		["you", 0, [
 		 ["* you remind me of *", [
-		     "goto alike"
+			 "In what way ?",
+		     "What resemblence do you see ?",
+		     "What does that similarity suggest to you ?",
+		     "What other connections do you see ?",
+		     "What do you suppose that resemblence means ?",
+		     "What is the connection, do you suppose ?",
+		     "Could there really be some connection ?",
+		     "How ?"
 		  ]],
 		 ["* you are *", [
 		     "What makes you think I am (2) ?",
@@ -412,15 +416,13 @@ export let elizaKeywords: [string, number, [string, string[]][]][] = [
 		["can", 0, [
 		 ["* can you *", [
 		     "You believe I can (2) don't you ?",
-		     "goto what",
 		     "You want me to be able to (2).",
 		     "Perhaps you would like to be able to (2) yourself."
 		  ]],
 		 ["* can i *", [
 		     "Whether or not you can (2) depends on you more than on me.",
 		     "Do you want to be able to (2) ?",
-		     "Perhaps you don't want to (2).",
-		     "goto what"
+		     "Perhaps you don't want to (2)."
 		  ]]
 		]],
 		["what", 0, [
@@ -438,22 +440,54 @@ export let elizaKeywords: [string, number, [string, string[]][]][] = [
 		]],
 		["who", 0, [
 		 ["who *", [
-		     "goto what"
+		     		     "Why do you ask ?",
+		     "Does that question interest you ?",
+		     "What is it you really want to know ?",
+		     "Are such questions much on your mind ?",
+		     "What answer would please you most ?",
+		     "What do you think ?",
+		     "What comes to mind when you ask that ?",
+		     "Have you asked such questions before ?",
+		     "Have you asked anyone else ?"
 		  ]]
 		]],
 		["when", 0, [
 		 ["when *", [
-		     "goto what"
+			"Why do you ask ?",
+		     "Does that question interest you ?",
+		     "What is it you really want to know ?",
+		     "Are such questions much on your mind ?",
+		     "What answer would please you most ?",
+		     "What do you think ?",
+		     "What comes to mind when you ask that ?",
+		     "Have you asked such questions before ?",
+		     "Have you asked anyone else ?"
 		  ]]
 		]],
 		["where", 0, [
 		 ["where *", [
-		     "goto what"
+			"Why do you ask ?",
+		     "Does that question interest you ?",
+		     "What is it you really want to know ?",
+		     "Are such questions much on your mind ?",
+		     "What answer would please you most ?",
+		     "What do you think ?",
+		     "What comes to mind when you ask that ?",
+		     "Have you asked such questions before ?",
+		     "Have you asked anyone else ?"
 		  ]]
 		]],
 		["how", 0, [
 		 ["how *", [
-		     "goto what"
+			"Why do you ask ?",
+		     "Does that question interest you ?",
+		     "What is it you really want to know ?",
+		     "Are such questions much on your mind ?",
+		     "What answer would please you most ?",
+		     "What do you think ?",
+		     "What comes to mind when you ask that ?",
+		     "Have you asked such questions before ?",
+		     "Have you asked anyone else ?"
 		  ]]
 		]],
 		["because", 0, [
@@ -469,18 +503,24 @@ export let elizaKeywords: [string, number, [string, string[]][]][] = [
 		     "Do you believe I don't (2) ?",
 		     "Perhaps I will (2) in good time.",
 		     "Should you (2) yourself ?",
-		     "You want me to (2) ?",
-		     "goto what"
+		     "You want me to (2) ?"
 		  ]],
 		 ["* why can't i *", [
 		     "Do you think you should be able to (2) ?",
 		     "Do you want to be able to (2) ?",
 		     "Do you believe this will help you to (2) ?",
-		     "Have you any idea why you can't (2) ?",
-		     "goto what"
+		     "Have you any idea why you can't (2) ?"
 		  ]],
 		 ["*", [
-		     "goto what"
+			"Why do you ask ?",
+		     "Does that question interest you ?",
+		     "What is it you really want to know ?",
+		     "Are such questions much on your mind ?",
+		     "What answer would please you most ?",
+		     "What do you think ?",
+		     "What comes to mind when you ask that ?",
+		     "Have you asked such questions before ?",
+		     "Have you asked anyone else ?"
 		  ]]
 		]],
 		["everyone", 2, [

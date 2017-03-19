@@ -15,9 +15,9 @@ export class Eliza {
         }
     }
     buildRules(rules: [string, string[]][]): Rule[] {
-        let result: Rule[];
+        let result: Rule[] = [];
         for (let rule of rules) {
-            let r = new Rule(rule);
+            let r: Rule = new Rule(rule);
             result.push(r);
         }
         return result;
@@ -34,7 +34,7 @@ export class Eliza {
         return this.reassemble(input, reassemblyRule, decompositionRule.decompRule);
     }
     sanatize(input: string): string {
-        return input.replace(/[\.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+        return input.replace(/[\.,\/#!$%\^&\*;:{}=\-_`~()]/g, ' ');
     }
     /* find highest priority keywords and get associated decomp rules */
     getDecompositionRules(input: string): Rule[] {
@@ -59,7 +59,7 @@ export class Eliza {
         }
     }
     getReassemblyRule(input: string, rule: Rule): string {
-        return rule.reassembRules[this.randomNumIncl(1, rule.reassembRules[1].length-1)];
+        return rule.reassembRules[this.randomNumIncl(1, rule.reassembRules.length-1)];
     }
     getRegExp(input: string): RegExp {
         let transform: string = input.replace(/\*/g, '.*');
@@ -69,27 +69,21 @@ export class Eliza {
         return (Math.floor(Math.random() * (max - min + 1)) + min);
     }
     reassemble(input: string, reassembRule: string, decompRule: string): string {
-        // get all position of *
-        let starPos: number[];
-        let match: RegExpExecArray;
-        while (match = /\*/g.exec(decompRule))
-            starPos.push(match.index);
+        // find number (n) in reassemb rule
+        let match: RegExpExecArray = /\([0-9]\)/g.exec(reassembRule);
+        if (match == null)
+            return reassembRule;
+        
+        let wordNum: number = Number(match[0][1]);
 
-        // find all (n) in reassemb rule
-        let numPos: number[];
-        while (match = /\((0-9)\)/g.exec(reassembRule))
-            numPos.push(match.index);
+        // split decompRule and find nth grouping
+        let decompArr: string[] = decompRule.split('*').map(x => x.trim());
+        decompArr = decompArr.filter(x => x != '');
+       
+        let inputArr: string[] = input.split(decompArr[0]).map(x => x.trim());
+        let replacement: string = inputArr[wordNum-1];
 
-        let result: string = reassembRule;
-        for (let pos of numPos) {
-            result = this.replaceNum(result, pos, decompRule, starPos);
-        }
-
-        return result;
-    }
-    replaceNum(input: string, pos: number, decompRule: string, starPos: number[]): string {
-        let n: string = input[pos+1];
-        let m: number = starPos[Number(n)-1];
+        return reassembRule.replace(/\([0-9]\)/g, replacement);
     }
 }
 
